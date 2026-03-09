@@ -66,7 +66,7 @@ export async function getProfile(token: string): Promise<AuthResponse> {
 }
 
 export function setAccessToken(token: string): void {
-  document.cookie = `accessToken=${token}; path=/; max-age=${60 * 60 * 24}; SameSite=Strict`;
+  document.cookie = `accessToken=${token}; path=/; max-age=${60 * 60 * 24}; Secure; SameSite=None`;
 }
 
 export function getAccessToken(): string | null {
