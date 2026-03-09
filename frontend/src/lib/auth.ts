@@ -75,5 +75,5 @@ export function getAccessToken(): string | null {
 }
 
 export function removeAccessToken(): void {
-  document.cookie = 'accessToken=; path=/; max-age=0';
+  document.cookie = 'accessToken=; path=/; max-age=0; Secure; SameSite=None';
 }

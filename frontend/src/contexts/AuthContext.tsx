@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, login as apiLogin, register as apiRegister, logout as apiLogout, setAccessToken, removeAccessToken, getAccessToken } from '@/lib/auth';
+import { User, login as apiLogin, register as apiRegister, logout as apiLogout, refreshToken, setAccessToken, removeAccessToken, getAccessToken } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -35,21 +35,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (token) {
-      const payload = decodeJwtPayload(token);
-      if (payload) {
-        setUser({
-          _id: payload.userId as string,
-          email: payload.email as string,
-          firstName: payload.firstName as string,
-          lastName: payload.lastName as string,
-        });
+    const init = async () => {
+      const token = getAccessToken();
+      if (token) {
+        const payload = decodeJwtPayload(token);
+        if (payload) {
+          setUser({
+            _id: payload.userId as string,
+            email: payload.email as string,
+            firstName: payload.firstName as string,
+            lastName: payload.lastName as string,
+          });
+        } else {
+          removeAccessToken();
+        }
       } else {
-        removeAccessToken();
+        // Try silent refresh – the httpOnly refreshToken cookie is sent automatically
+        try {
+          const res = await refreshToken();
+          if (res.success && res.data) {
+            const newToken = (res.data as { accessToken: string }).accessToken;
+            setAccessToken(newToken);
+            const payload = decodeJwtPayload(newToken);
+            if (payload) {
+              setUser({
+                _id: payload.userId as string,
+                email: payload.email as string,
+                firstName: payload.firstName as string,
+                lastName: payload.lastName as string,
+              });
+            }
+          }
+        } catch {
+          // No valid refresh token – user must log in
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+    init();
   }, []);
 
   const login = async (email: string, password: string) => {

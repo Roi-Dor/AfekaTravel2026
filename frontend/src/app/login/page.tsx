@@ -24,6 +24,8 @@ function LoginForm() {
     const result = await login(email, password);
     
     if (result.success) {
+      // Small delay to let the cookie settle before middleware reads it
+      await new Promise(r => setTimeout(r, 100));
       router.push(redirect);
     } else {
       setError(result.message);
