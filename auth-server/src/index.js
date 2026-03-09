@@ -15,6 +15,7 @@ connectDB();
 
 const allowedOrigins = [
   'http://localhost:3000',
+  'https://afeka-travel2026.vercel.app',
   ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(u => u.trim()) : []),
 ];
 
