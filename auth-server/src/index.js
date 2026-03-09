@@ -22,11 +22,17 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (e.g. server-to-server, curl, mobile apps)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS: origin ${origin} not allowed`));
+    if (!origin) return callback(null, true);
+
+    // Allow exact matches from the allowedOrigins list
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    // Allow all Vercel preview deployments for this project
+    if (origin.endsWith('.vercel.app') && origin.includes('afeka-travel2026')) {
+      return callback(null, true);
     }
+
+    callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true
 }));
