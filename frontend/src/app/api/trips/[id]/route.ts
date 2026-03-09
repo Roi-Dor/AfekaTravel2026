@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL || 'http://localhost:5001';
+const AUTH_SERVER_URL = process.env.AUTH_SERVER_URL || process.env.NEXT_PUBLIC_AUTH_SERVER_URL || 'http://localhost:5001';
 
 // DELETE /api/trips/:id — delete a specific trip
 export async function DELETE(
